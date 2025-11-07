@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.tcm_app.ui.theme.TCMOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,7 +104,7 @@ fun LicenseManagementScreen(
                                 )
                             )
                     )
-                    
+
                     Column(
                         modifier = Modifier.padding(20.dp)
                     ) {
@@ -129,7 +128,7 @@ fun LicenseManagementScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                             }
-                            
+
                             // TCM Logo
                             Box(
                                 modifier = Modifier
@@ -145,9 +144,9 @@ fun LicenseManagementScreen(
                                 )
                             }
                         }
-                        
+
                         Spacer(Modifier.height(24.dp))
-                        
+
                         // License Type
                         Text(
                             "TEACHING LICENSE",
@@ -155,9 +154,9 @@ fun LicenseManagementScreen(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
-                        
+
                         Spacer(Modifier.height(8.dp))
-                        
+
                         // License Number
                         Text(
                             uiState.licenseNumber,
@@ -165,9 +164,9 @@ fun LicenseManagementScreen(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        
+
                         Spacer(Modifier.height(16.dp))
-                        
+
                         // Teacher Name
                         Text(
                             uiState.teacherName.uppercase(),
@@ -175,9 +174,9 @@ fun LicenseManagementScreen(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        
+
                         Spacer(Modifier.height(24.dp))
-                        
+
                         // Dates
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -196,7 +195,7 @@ fun LicenseManagementScreen(
                                     fontWeight = FontWeight.SemiBold
                                 )
                             }
-                            
+
                             Column {
                                 Text(
                                     "EXPIRES",
@@ -210,7 +209,7 @@ fun LicenseManagementScreen(
                                     fontWeight = FontWeight.SemiBold
                                 )
                             }
-                            
+
                             Column {
                                 Text(
                                     "STATUS",
@@ -244,7 +243,7 @@ fun LicenseManagementScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = TCMOrange.copy(alpha = 0.1f)
+                        containerColor = MaterialTheme.colorScheme.errorContainer
                     )
                 ) {
                     Row(
@@ -254,7 +253,7 @@ fun LicenseManagementScreen(
                         Icon(
                             Icons.Default.Warning,
                             null,
-                            tint = TCMOrange,
+                            tint = MaterialTheme.colorScheme.onErrorContainer,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(Modifier.width(12.dp))
@@ -262,17 +261,18 @@ fun LicenseManagementScreen(
                             Text(
                                 "Renewal Reminder",
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onErrorContainer
                             )
                             Text(
                                 "Your license expires in ${uiState.daysToExpiry} days",
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                color = MaterialTheme.colorScheme.onErrorContainer
                             )
                         }
                     }
                 }
-                
+
                 Spacer(Modifier.height(16.dp))
             }
 
@@ -297,15 +297,15 @@ fun LicenseManagementScreen(
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.weight(1f)
                 )
-                
+
                 ActionCard(
                     icon = Icons.Default.Download,
                     title = "Download",
-                    subtitle = "PDF",
+                    subtitle = "License",
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                
+
                 ActionCard(
                     icon = Icons.Default.Share,
                     title = "Share",
@@ -334,16 +334,16 @@ fun LicenseManagementScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     DetailRow("License Type", "Primary Teaching License")
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
-                    
+
                     DetailRow("Registration Number", "TCM/REG/2023/5678")
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
-                    
+
                     DetailRow("Category", "Qualified Teacher")
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
-                    
+
                     DetailRow("Subject Area", "Primary Education")
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
-                    
+
                     DetailRow("Valid for", "All Malawi Schools")
                 }
             }
@@ -470,9 +470,9 @@ fun RenewalHistoryCard(record: RenewalRecord) {
                     modifier = Modifier.size(24.dp)
                 )
             }
-            
+
             Spacer(Modifier.width(12.dp))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     record.status,
@@ -485,7 +485,7 @@ fun RenewalHistoryCard(record: RenewalRecord) {
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
-            
+
             Text(
                 record.period,
                 fontSize = 14.sp,

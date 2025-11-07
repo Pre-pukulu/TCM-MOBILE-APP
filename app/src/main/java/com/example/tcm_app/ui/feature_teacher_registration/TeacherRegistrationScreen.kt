@@ -1,6 +1,8 @@
 package com.example.tcm_app.ui.feature_teacher_registration
 
 import android.app.Activity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,14 +10,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tcm_app.navigation.ObserveSingleFireNavigation
@@ -28,6 +34,7 @@ fun TeacherRegistrationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val activity = (LocalContext.current as? Activity)
+    val totalSteps = 4
 
     viewModel.navigationEvent.ObserveSingleFireNavigation { navigation ->
         when (navigation) {
@@ -45,52 +52,89 @@ fun TeacherRegistrationScreen(
                 title = { Text("Teacher Registration") },
                 navigationIcon = {
                     IconButton(onClick = viewModel::onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
                 )
             )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color.White,
+                modifier = Modifier.height(80.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (uiState.currentStep > 0) {
+                        OutlinedButton(
+                            onClick = viewModel::onPreviousStep,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Previous")
+                        }
+                        Spacer(Modifier.width(12.dp))
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.width(12.dp))
+                    }
+
+                    Button(
+                        onClick = {
+                            if (uiState.currentStep < totalSteps - 1) {
+                                viewModel.onNextStep()
+                            } else {
+                                // TODO: Submit form
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(if (uiState.currentStep == totalSteps - 1) "Submit" else "Next")
+                        Spacer(Modifier.width(8.dp))
+                        Icon(
+                            if (uiState.currentStep == totalSteps - 1) Icons.Default.Check
+                            else Icons.AutoMirrored.Filled.ArrowForward,
+                            null,
+                            Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Stepper(currentStep = uiState.currentStep, steps = listOf("Personal", "Address", "Education")) {
-                viewModel.onStepClicked(it)
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-            when (uiState.currentStep) {
-                0 -> PersonalInfoStep(uiState, viewModel)
-                1 -> AddressStep(uiState, viewModel)
-                2 -> EducationStep(uiState, viewModel)
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            StepProgressIndicator(
+                currentStep = uiState.currentStep,
+                totalSteps = totalSteps,
+                onStepClicked = { viewModel.onStepClicked(it) }
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
             ) {
-                if (uiState.currentStep > 0) {
-                    Button(onClick = viewModel::onPreviousStep) {
-                        Text("Previous")
-                    }
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                if (uiState.currentStep < 2) {
-                    Button(onClick = viewModel::onNextStep) {
-                        Text("Next")
-                    }
-                } else {
-                    Button(onClick = { /* TODO: Implement registration logic */ }) {
-                        Text("Register")
-                    }
+                when (uiState.currentStep) {
+                    0 -> PersonalInfoStep(uiState, viewModel)
+                    1 -> AddressStep(uiState, viewModel)
+                    2 -> EducationStep(uiState, viewModel)
+                    3 -> DocumentsStep()
                 }
             }
         }
@@ -98,114 +142,252 @@ fun TeacherRegistrationScreen(
 }
 
 @Composable
+fun StepProgressIndicator(currentStep: Int, totalSteps: Int, onStepClicked: (Int) -> Unit) {
+    val steps = listOf("Personal", "Address", "Education", "Documents")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            steps.forEachIndexed { index, step ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onStepClicked(index) }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                if (index <= currentStep)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    Color.LightGray,
+                                shape = RoundedCornerShape(20.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (index < currentStep) {
+                            Icon(
+                                Icons.Default.Check,
+                                null,
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        } else {
+                            Text(
+                                "${index + 1}",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        step,
+                        fontSize = 12.sp,
+                        color = if (index <= currentStep)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            Color.Gray,
+                        fontWeight = if (index == currentStep) FontWeight.Bold else FontWeight.Normal
+                    )
+                }
+
+                if (index < steps.size - 1) {
+                    Box(
+                        modifier = Modifier
+                            .weight(0.5f)
+                            .height(2.dp)
+                            .align(Alignment.CenterVertically)
+                            .background(
+                                if (index < currentStep)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    Color.LightGray
+                            )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun PersonalInfoStep(uiState: TeacherRegistrationState, viewModel: TeacherRegistrationViewModel) {
+    var genderExpanded by remember { mutableStateOf(false) }
+
     Column {
+        SectionHeader("Personal Information")
+
         OutlinedTextField(
             value = uiState.firstName,
             onValueChange = viewModel::onFirstNameChange,
-            label = { Text("First Name") },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            label = { Text("First Name *") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.lastName,
             onValueChange = viewModel::onLastNameChange,
-            label = { Text("Last Name") },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            label = { Text("Last Name *") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.middleName,
             onValueChange = viewModel::onMiddleNameChange,
-            label = { Text("Middle Name") },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            label = { Text("Middle Name (Optional)") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.nationalId,
             onValueChange = viewModel::onNationalIdChange,
-            label = { Text("National ID") },
+            label = { Text("National ID *") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.dateOfBirth,
             onValueChange = viewModel::onDateOfBirthChange,
-            label = { Text("Date of Birth") },
+            label = { Text("Date of Birth *") },
+            placeholder = { Text("DD/MM/YYYY") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            trailingIcon = {
+                Icon(Icons.Default.CalendarToday, null)
+            }
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = uiState.gender,
-            onValueChange = viewModel::onGenderChange,
-            label = { Text("Gender") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = genderExpanded,
+            onExpandedChange = { genderExpanded = it }
+        ) {
+            OutlinedTextField(
+                value = uiState.gender,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Gender *") },
+                trailingIcon = {
+                    Icon(Icons.Default.ArrowDropDown, null)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            ExposedDropdownMenu(
+                expanded = genderExpanded,
+                onDismissRequest = { genderExpanded = false }
+            ) {
+                listOf("Male", "Female").forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            viewModel.onGenderChange(option)
+                            genderExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.phone,
             onValueChange = viewModel::onPhoneChange,
-            label = { Text("Phone Number") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            label = { Text("Phone Number *") },
+            placeholder = { Text("+265 888 123 456") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            leadingIcon = { Icon(Icons.Default.Phone, null) }
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.email,
             onValueChange = viewModel::onEmailChange,
-            label = { Text("Email Address") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            label = { Text("Email Address *") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            leadingIcon = { Icon(Icons.Default.Email, null) }
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressStep(uiState: TeacherRegistrationState, viewModel: TeacherRegistrationViewModel) {
+    var districtExpanded by remember { mutableStateOf(false) }
+    val districts = listOf(
+        "Blantyre", "Lilongwe", "Mzuzu", "Zomba", "Kasungu",
+        "Mangochi", "Salima", "Karonga", "Dedza", "Balaka"
+    )
+
     Column {
-        OutlinedTextField(
-            value = uiState.district,
-            onValueChange = viewModel::onDistrictChange,
-            label = { Text("District") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        SectionHeader("Address Information")
+
+        ExposedDropdownMenuBox(
+            expanded = districtExpanded,
+            onExpandedChange = { districtExpanded = it }
+        ) {
+            OutlinedTextField(
+                value = uiState.district,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("District *") },
+                trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            ExposedDropdownMenu(
+                expanded = districtExpanded,
+                onDismissRequest = { districtExpanded = false }
+            ) {
+                districts.forEach { d ->
+                    DropdownMenuItem(
+                        text = { Text(d) },
+                        onClick = {
+                            viewModel.onDistrictChange(d)
+                            districtExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.traditionalAuthority,
             onValueChange = viewModel::onTraditionalAuthorityChange,
-            label = { Text("Traditional Authority") },
+            label = { Text("Traditional Authority *") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.village,
             onValueChange = viewModel::onVillageChange,
-            label = { Text("Village") },
+            label = { Text("Village/Area *") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
     }
@@ -214,99 +396,175 @@ fun AddressStep(uiState: TeacherRegistrationState, viewModel: TeacherRegistratio
 @Composable
 fun EducationStep(uiState: TeacherRegistrationState, viewModel: TeacherRegistrationViewModel) {
     Column {
+        SectionHeader("Education Qualifications")
+
+        Text(
+            "MSCE Certificate",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
         OutlinedTextField(
             value = uiState.msceYear,
             onValueChange = viewModel::onMsceYearChange,
-            label = { Text("MSCE Year") },
+            label = { Text("Year Obtained *") },
+            placeholder = { Text("e.g., 2015") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "Teaching Diploma",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
         OutlinedTextField(
             value = uiState.diploma,
             onValueChange = viewModel::onDiplomaChange,
-            label = { Text("Diploma") },
+            label = { Text("Diploma Name") },
+            placeholder = { Text("e.g., Diploma in Primary Education") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.diplomaYear,
             onValueChange = viewModel::onDiplomaYearChange,
-            label = { Text("Diploma Year") },
+            label = { Text("Year Obtained") },
+            placeholder = { Text("e.g., 2018") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "Bachelor's Degree (Optional)",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
         OutlinedTextField(
             value = uiState.degree,
             onValueChange = viewModel::onDegreeChange,
-            label = { Text("Degree") },
+            label = { Text("Degree Name") },
+            placeholder = { Text("e.g., Bachelor of Education") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = uiState.degreeYear,
             onValueChange = viewModel::onDegreeYearChange,
-            label = { Text("Degree Year") },
+            label = { Text("Year Obtained") },
+            placeholder = { Text("e.g., 2022") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }
 }
 
 @Composable
-fun Stepper(
-    currentStep: Int,
-    steps: List<String>,
-    onStepClicked: (Int) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        steps.forEachIndexed { index, title ->
-            Step(
-                title = title,
-                isCurrent = currentStep == index,
-                isCompleted = currentStep > index,
-                onClick = { onStepClicked(index) }
+fun DocumentsStep() {
+    val documents = listOf(
+        "Passport Photo" to "Required",
+        "National ID" to "Required",
+        "MSCE Certificate" to "Required",
+        "Teaching Diploma" to "Required",
+        "Degree Certificate" to "Optional",
+        "Police Report" to "Required"
+    )
+
+    Column {
+        SectionHeader("Upload Documents")
+
+        Text(
+            "Please upload clear copies of the following documents:",
+            fontSize = 14.sp,
+            color = Color.Gray,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        documents.forEach { (doc, status) ->
+            DocumentUploadCard(
+                documentName = doc,
+                status = status
             )
-            if (index < steps.size - 1) {
-                Spacer(modifier = Modifier.width(8.dp))
+            Spacer(Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+fun DocumentUploadCard(documentName: String, status: String) {
+    var uploaded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (uploaded) Color(0xFFE8F5E9) else Color.White
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    documentName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    status,
+                    fontSize = 12.sp,
+                    color = if (status == "Required") Color(0xFFE53935) else Color.Gray
+                )
+                if (uploaded) {
+                    Text(
+                        "✓ Uploaded",
+                        fontSize = 12.sp,
+                        color = Color(0xFF43A047),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+
+            Button(
+                onClick = { uploaded = !uploaded },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (uploaded)
+                        Color(0xFF43A047)
+                    else
+                        MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Icon(
+                    if (uploaded) Icons.Default.Check else Icons.Default.Upload,
+                    null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(if (uploaded) "Done" else "Upload")
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Step(
-    title: String,
-    isCurrent: Boolean,
-    isCompleted: Boolean,
-    onClick: () -> Unit
-) {
-    val color = when {
-        isCurrent -> MaterialTheme.colorScheme.primary
-        isCompleted -> MaterialTheme.colorScheme.secondary
-        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-    }
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = color)
-    ) {
-        Text(
-            text = title,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            color = MaterialTheme.colorScheme.onPrimary
-        )
-    }
+fun SectionHeader(text: String) {
+    Text(
+        text,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(bottom = 16.dp)
+    )
 }
