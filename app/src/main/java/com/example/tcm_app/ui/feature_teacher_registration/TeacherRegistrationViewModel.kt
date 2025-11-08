@@ -8,10 +8,14 @@ import kotlinx.coroutines.flow.update
 
 sealed class TeacherRegistrationNavigation {
     object Back : TeacherRegistrationNavigation()
+    object Profile : TeacherRegistrationNavigation()
+    object Settings : TeacherRegistrationNavigation()
+    object Login : TeacherRegistrationNavigation()
 }
 
 data class TeacherRegistrationState(
     val currentStep: Int = 0,
+    val showMenu: Boolean = false,
     // Personal Info
     val firstName: String = "",
     val lastName: String = "",
@@ -41,13 +45,29 @@ class TeacherRegistrationViewModel : ViewModel() {
     private val _navigationEvent = mutableSingleFireNavigation<TeacherRegistrationNavigation>()
     val navigationEvent = _navigationEvent
 
+    fun onMenuToggled() {
+        _uiState.update { it.copy(showMenu = !it.showMenu) }
+    }
+
+    fun onProfileClick() {
+        _navigationEvent.tryEmit(TeacherRegistrationNavigation.Profile)
+    }
+
+    fun onSettingsClick() {
+        _navigationEvent.tryEmit(TeacherRegistrationNavigation.Settings)
+    }
+
+    fun onLogoutClick() {
+        _navigationEvent.tryEmit(TeacherRegistrationNavigation.Login)
+    }
+
     fun onStepClicked(stepIndex: Int) {
         // Allow navigation to any step
         _uiState.update { it.copy(currentStep = stepIndex) }
     }
 
     fun onNextStep() {
-        if (_uiState.value.currentStep < 3) { // 3 is the last step index
+        if (_uiState.value.currentStep < 4) { // 4 is the last step index
             _uiState.update { it.copy(currentStep = it.currentStep + 1) }
         }
     }

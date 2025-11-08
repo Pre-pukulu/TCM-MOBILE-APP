@@ -14,6 +14,9 @@ sealed class DashboardNavigation {
     object LicenseManagement : DashboardNavigation()
     object CPDTracking : DashboardNavigation()
     object ApplicationStatus : DashboardNavigation()
+    object Settings : DashboardNavigation()
+    object TeacherVerification : DashboardNavigation()
+    object Notifications : DashboardNavigation()
 }
 
 data class DashboardState(
@@ -60,5 +63,17 @@ class DashboardViewModel : ViewModel() {
 
     fun onApplicationStatusClick() {
         _navigationEvent.tryEmit(DashboardNavigation.ApplicationStatus)
+    }
+
+    fun onSettingsClick() {
+        _navigationEvent.tryEmit(DashboardNavigation.Settings)
+    }
+
+    fun onTeacherVerificationClick() {
+        _navigationEvent.tryEmit(DashboardNavigation.TeacherVerification)
+    }
+
+    fun onNotificationsClick() {
+        _navigationEvent.tryEmit(DashboardNavigation.Notifications)
     }
 }

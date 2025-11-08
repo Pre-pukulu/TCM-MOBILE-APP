@@ -8,7 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,8 +40,15 @@ fun LoginScreen(
                     popUpTo(Screen.Login.route) { inclusive = true }
                 }
             }
-            LoginNavigation.Register -> navController.navigate(Screen.Register.route)
-            LoginNavigation.TeacherVerification -> navController.navigate(Screen.TeacherVerification.route)
+            LoginNavigation.AdminLogin -> {
+                navController.navigate(Screen.AdminLogin.route)
+            }
+            LoginNavigation.Register -> {
+                navController.navigate(Screen.Register.route)
+            }
+            LoginNavigation.TeacherVerification -> {
+                navController.navigate(Screen.TeacherVerification.route)
+            }
         }
     }
 
@@ -123,7 +130,7 @@ fun LoginScreen(
                 onValueChange = viewModel::onEmailChange,
                 label = { Text("Email Address") },
                 leadingIcon = {
-                    Icon(Icons.Outlined.Email, contentDescription = null)
+                    Icon(Icons.Default.Email, contentDescription = null)
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth(),
@@ -139,12 +146,12 @@ fun LoginScreen(
                 onValueChange = viewModel::onPasswordChange,
                 label = { Text("Password") },
                 leadingIcon = {
-                    Icon(Icons.Outlined.Lock, contentDescription = null)
+                    Icon(Icons.Default.Lock, contentDescription = null)
                 },
                 trailingIcon = {
                     IconButton(onClick = viewModel::onPasswordVisibilityToggle) {
                         Icon(
-                            imageVector = if (uiState.isPasswordVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
+                            imageVector = if (uiState.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                             contentDescription = if (uiState.isPasswordVisible) "Hide password" else "Show password"
                         )
                     }
@@ -171,7 +178,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Error Message
-            if (uiState.errorMessage != null) {
+            if (uiState.errorMessage.isNotEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -183,13 +190,13 @@ fun LoginScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Outlined.Error,
+                            Icons.Default.Error,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = uiState.errorMessage!!,
+                            text = uiState.errorMessage,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                             fontSize = 14.sp
                         )
@@ -228,14 +235,14 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                HorizontalDivider(modifier = Modifier.weight(1f))
+                Divider(modifier = Modifier.weight(1f))
                 Text(
                     text = "OR",
                     modifier = Modifier.padding(horizontal = 16.dp),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
-                HorizontalDivider(modifier = Modifier.weight(1f))
+                Divider(modifier = Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -248,10 +255,7 @@ fun LoginScreen(
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Icon(
-                    Icons.Outlined.Phone,
-                    contentDescription = null
-                )
+                Icon(Icons.Default.Phone, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Login with Phone Number",
@@ -272,7 +276,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 )
                 Text(
-                    text = "Sign up",
+                    text = "Sign-Up",
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
@@ -284,10 +288,10 @@ fun LoginScreen(
 
             // Verification Link
             TextButton(
-                onClick = viewModel::onTeacherVerificationClick,
+                onClick = viewModel::onVerifyTeacherClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Outlined.VerifiedUser, contentDescription = null)
+                Icon(Icons.Default.VerifiedUser, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Verify Teacher Registration")
             }

@@ -2,9 +2,16 @@ package com.example.tcm_app.ui.feature_cpd_tracking
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.example.tcm_app.navigation.mutableSingleFireNavigation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+
+sealed class CPDTrackingNavigation {
+    object Profile : CPDTrackingNavigation()
+    object Settings : CPDTrackingNavigation()
+    object Login : CPDTrackingNavigation()
+}
 
 data class CPDActivity(
     val id: String,
@@ -23,6 +30,7 @@ data class CPDTrackingState(
     val selectedYear: Int = 2024,
     val totalPoints: Double = 15.0,
     val requiredPoints: Double = 20.0,
+    val showMenu: Boolean = false,
     val cpdActivities: List<CPDActivity> = listOf(
         CPDActivity(
             "1",
@@ -77,6 +85,25 @@ class CPDTrackingViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(CPDTrackingState())
     val uiState = _uiState.asStateFlow()
+
+    private val _navigationEvent = mutableSingleFireNavigation<CPDTrackingNavigation>()
+    val navigationEvent = _navigationEvent
+
+    fun onMenuToggled() {
+        _uiState.update { it.copy(showMenu = !it.showMenu) }
+    }
+
+    fun onProfileClick() {
+        _navigationEvent.tryEmit(CPDTrackingNavigation.Profile)
+    }
+
+    fun onSettingsClick() {
+        _navigationEvent.tryEmit(CPDTrackingNavigation.Settings)
+    }
+
+    fun onLogoutClick() {
+        _navigationEvent.tryEmit(CPDTrackingNavigation.Login)
+    }
 
     fun onAddActivityClicked() {
         _uiState.update { it.copy(showAddDialog = true) }

@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -19,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.tcm_app.navigation.ObserveSingleFireNavigation
+import com.example.tcm_app.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +30,16 @@ fun LicenseManagementScreen(
     viewModel: LicenseManagementViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    viewModel.navigationEvent.ObserveSingleFireNavigation { navigation ->
+        when (navigation) {
+            LicenseManagementNavigation.Profile -> navController.navigate(Screen.Profile.route)
+            LicenseManagementNavigation.Settings -> navController.navigate(Screen.Settings.route)
+            LicenseManagementNavigation.Login -> navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -46,19 +59,29 @@ fun LicenseManagementScreen(
                         onDismissRequest = viewModel::onMenuToggled
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Download PDF") },
-                            onClick = { viewModel.onMenuToggled() },
-                            leadingIcon = { Icon(Icons.Default.Download, null) }
+                            text = { Text("Profile") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onProfileClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Person, null) }
                         )
                         DropdownMenuItem(
-                            text = { Text("Share License") },
-                            onClick = { viewModel.onMenuToggled() },
-                            leadingIcon = { Icon(Icons.Default.Share, null) }
+                            text = { Text("Settings") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onSettingsClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Settings, null) }
                         )
+                        Divider()
                         DropdownMenuItem(
-                            text = { Text("Print") },
-                            onClick = { viewModel.onMenuToggled() },
-                            leadingIcon = { Icon(Icons.Default.Print, null) }
+                            text = { Text("Logout") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onLogoutClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Logout, null) }
                         )
                     }
                 },
@@ -178,57 +201,67 @@ fun LicenseManagementScreen(
                         Spacer(Modifier.height(24.dp))
 
                         // Dates
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.Blue.copy(alpha = 0.3f))
                         ) {
-                            Column {
-                                Text(
-                                    "ISSUED",
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                                    fontSize = 10.sp
-                                )
-                                Text(
-                                    uiState.issueDate,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-
-                            Column {
-                                Text(
-                                    "EXPIRES",
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                                    fontSize = 10.sp
-                                )
-                                Text(
-                                    uiState.expiryDate,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-
-                            Column {
-                                Text(
-                                    "STATUS",
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                                    fontSize = 10.sp
-                                )
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(8.dp)
-                                            .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(4.dp))
-                                    )
-                                    Spacer(Modifier.width(4.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
                                     Text(
-                                        uiState.status,
+                                        "ISSUED",
+                                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                                        fontSize = 10.sp
+                                    )
+                                    Text(
+                                        uiState.issueDate,
                                         color = MaterialTheme.colorScheme.onPrimary,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.SemiBold
                                     )
+                                }
+
+                                Column {
+                                    Text(
+                                        "EXPIRES",
+                                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                                        fontSize = 10.sp
+                                    )
+                                    Text(
+                                        uiState.expiryDate,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+
+                                Column {
+                                    Text(
+                                        "STATUS",
+                                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                                        fontSize = 10.sp
+                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(8.dp)
+                                                .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(4.dp))
+                                        )
+                                        Spacer(Modifier.width(4.dp))
+                                        Text(
+                                            uiState.status,
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -243,7 +276,7 @@ fun LicenseManagementScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
                     )
                 ) {
                     Row(
@@ -251,9 +284,9 @@ fun LicenseManagementScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Default.Warning,
+                            Icons.Default.Info,
                             null,
-                            tint = MaterialTheme.colorScheme.onErrorContainer,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(Modifier.width(12.dp))
@@ -262,12 +295,12 @@ fun LicenseManagementScreen(
                                 "Renewal Reminder",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onErrorContainer
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 "Your license expires in ${uiState.daysToExpiry} days",
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onErrorContainer
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }

@@ -12,6 +12,9 @@ sealed class Screen(val route: String) {
     object CPDTracking : Screen("cpd_tracking")
     object ApplicationStatus : Screen("application_status")
     object AdminDashboard : Screen("admin_dashboard")
+    object AdminLogin : Screen("admin_login")
+    object Notifications : Screen("notifications")
     object Signup : Screen("signup")
+    object Settings : Screen("settings")
 
 }

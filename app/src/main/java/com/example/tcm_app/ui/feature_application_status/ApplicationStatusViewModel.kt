@@ -4,8 +4,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import com.example.tcm_app.navigation.mutableSingleFireNavigation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+
+sealed class ApplicationStatusNavigation {
+    object Profile : ApplicationStatusNavigation()
+    object Settings : ApplicationStatusNavigation()
+    object Login : ApplicationStatusNavigation()
+}
 
 enum class StageStatus {
     COMPLETED, IN_PROGRESS, PENDING
@@ -27,6 +35,7 @@ data class Document(
 
 data class ApplicationStatusState(
     val currentStage: Int = 2, // 0-indexed: 0=Submitted, 1=Under Review, 2=Document Verification, 3=Payment, 4=Approved
+    val showMenu: Boolean = false,
     val timelineStages: List<TimelineStage> = listOf(
         TimelineStage(
             "Application Submitted",
@@ -77,4 +86,23 @@ class ApplicationStatusViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(ApplicationStatusState())
     val uiState = _uiState.asStateFlow()
+
+    private val _navigationEvent = mutableSingleFireNavigation<ApplicationStatusNavigation>()
+    val navigationEvent = _navigationEvent
+
+    fun onMenuToggled() {
+        _uiState.update { it.copy(showMenu = !it.showMenu) }
+    }
+
+    fun onProfileClick() {
+        _navigationEvent.tryEmit(ApplicationStatusNavigation.Profile)
+    }
+
+    fun onSettingsClick() {
+        _navigationEvent.tryEmit(ApplicationStatusNavigation.Settings)
+    }
+
+    fun onLogoutClick() {
+        _navigationEvent.tryEmit(ApplicationStatusNavigation.Login)
+    }
 }

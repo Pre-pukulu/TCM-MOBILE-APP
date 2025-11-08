@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.tcm_app.navigation.ObserveSingleFireNavigation
 import com.example.tcm_app.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,6 +30,15 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    viewModel.navigationEvent.ObserveSingleFireNavigation { navigation ->
+        when (navigation) {
+            ProfileNavigation.Settings -> navController.navigate(Screen.Settings.route)
+            ProfileNavigation.Login -> navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -40,8 +50,38 @@ fun ProfileScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = viewModel::onEditClicked) {
-                        Icon(Icons.Default.Edit, "Edit")
+                    IconButton(onClick = viewModel::onMenuToggled) {
+                        Icon(Icons.Default.MoreVert, "Menu")
+                    }
+                    DropdownMenu(
+                        expanded = uiState.showMenu,
+                        onDismissRequest = viewModel::onMenuToggled
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Edit") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onEditClicked()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Edit, null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onSettingsClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Settings, null) }
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            text = { Text("Logout") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onLogoutClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Logout, null) }
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -272,46 +312,6 @@ fun ProfileScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Settings Section
-            SectionTitle("Settings")
-
-            SettingsItem(
-                icon = Icons.Default.Notifications,
-                title = "Notifications",
-                subtitle = "Manage notification preferences",
-                onClick = { }
-            )
-
-            SettingsItem(
-                icon = Icons.Default.Security,
-                title = "Change Password",
-                subtitle = "Update your account password",
-                onClick = { }
-            )
-
-            SettingsItem(
-                icon = Icons.Default.Language,
-                title = "Language",
-                subtitle = "English",
-                onClick = { }
-            )
-
-            SettingsItem(
-                icon = Icons.Default.Help,
-                title = "Help & Support",
-                subtitle = "Get help or contact support",
-                onClick = { }
-            )
-
-            SettingsItem(
-                icon = Icons.Default.Info,
-                title = "About",
-                subtitle = "App version 1.0.0",
-                onClick = { }
-            )
-
-            Spacer(Modifier.height(16.dp))
-
             // Logout Button
             Card(
                 modifier = Modifier
@@ -463,57 +463,6 @@ fun ProfileInfoCard(
                     tint = Color.Gray
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun SettingsItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                icon,
-                null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-
-            Spacer(Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    title,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    subtitle,
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-            }
-
-            Icon(
-                Icons.Default.ChevronRight,
-                null,
-                tint = Color.Gray
-            )
         }
     }
 }

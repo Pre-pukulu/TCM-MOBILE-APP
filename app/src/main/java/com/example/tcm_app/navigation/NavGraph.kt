@@ -9,9 +9,12 @@ import com.example.tcm_app.ui.feature_application_status.ApplicationStatusScreen
 import com.example.tcm_app.ui.feature_cpd_tracking.CPDTrackingScreen
 import com.example.tcm_app.ui.feature_dashboard.DashboardScreen
 import com.example.tcm_app.ui.feature_license_management.LicenseManagementScreen
+import com.example.tcm_app.ui.feature_login.AdminLoginScreen
 import com.example.tcm_app.ui.feature_login.LoginScreen
+import com.example.tcm_app.ui.feature_notifications.NotificationsScreen
 import com.example.tcm_app.ui.feature_profile.ProfileScreen
 import com.example.tcm_app.ui.feature_register.RegisterScreen
+import com.example.tcm_app.ui.feature_settings.SettingsScreen
 import com.example.tcm_app.ui.feature_splash.SplashScreen
 import com.example.tcm_app.ui.feature_teacher_registration.TeacherRegistrationScreen
 import com.example.tcm_app.ui.feature_teacher_verification.TeacherVerificationScreen
@@ -25,6 +28,9 @@ fun NavGraph() {
         }
         composable(Screen.Login.route) {
             LoginScreen(navController = navController)
+        }
+        composable(Screen.AdminLogin.route) {
+            AdminLoginScreen(navController = navController)
         }
         composable(Screen.Dashboard.route) {
             DashboardScreen(navController = navController)
@@ -52,6 +58,12 @@ fun NavGraph() {
         }
         composable(Screen.AdminDashboard.route) {
             AdminDashboardScreen(navController = navController)
+        }
+        composable(Screen.Settings.route) {
+            SettingsScreen(navController = navController)
+        }
+        composable(Screen.Notifications.route) {
+            NotificationsScreen(navController = navController)
         }
     }
 }

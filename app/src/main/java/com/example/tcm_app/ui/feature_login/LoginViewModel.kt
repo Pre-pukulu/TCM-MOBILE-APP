@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 
 sealed class LoginNavigation {
     object Dashboard : LoginNavigation()
+    object AdminLogin : LoginNavigation()
     object Register : LoginNavigation()
     object TeacherVerification : LoginNavigation()
 }
@@ -20,7 +21,7 @@ data class LoginState(
     val password: String = "",
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String = ""
 )
 
 class LoginViewModel : ViewModel() {
@@ -32,11 +33,11 @@ class LoginViewModel : ViewModel() {
     val navigationEvent = _navigationEvent
 
     fun onEmailChange(email: String) {
-        _uiState.update { it.copy(email = email, errorMessage = null) }
+        _uiState.update { it.copy(email = email, errorMessage = "") }
     }
 
     fun onPasswordChange(password: String) {
-        _uiState.update { it.copy(password = password, errorMessage = null) }
+        _uiState.update { it.copy(password = password, errorMessage = "") }
     }
 
     fun onPasswordVisibilityToggle() {
@@ -44,28 +45,28 @@ class LoginViewModel : ViewModel() {
     }
 
     fun onLoginClick() {
-        if (_uiState.value.email.isBlank() || _uiState.value.password.isBlank()) {
+        if (uiState.value.email.isBlank() || uiState.value.password.isBlank()) {
             _uiState.update { it.copy(errorMessage = "Please fill in all fields") }
             return
         }
-
+        
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            delay(1000) // Mock login delay
-            _navigationEvent.tryEmit(LoginNavigation.Dashboard)
+            _uiState.update { it.copy(isLoading = true, errorMessage = "") }
+            delay(1000) // Simulate network call
             _uiState.update { it.copy(isLoading = false) }
+            _navigationEvent.tryEmit(LoginNavigation.Dashboard)
         }
     }
 
     fun onRegisterClick() {
-        viewModelScope.launch {
-            _navigationEvent.tryEmit(LoginNavigation.Register)
-        }
+        _navigationEvent.tryEmit(LoginNavigation.Register)
     }
 
-    fun onTeacherVerificationClick() {
-        viewModelScope.launch {
-            _navigationEvent.tryEmit(LoginNavigation.TeacherVerification)
-        }
+    fun onAdminLoginClick() {
+        _navigationEvent.tryEmit(LoginNavigation.AdminLogin)
+    }
+    
+    fun onVerifyTeacherClick() {
+        _navigationEvent.tryEmit(LoginNavigation.TeacherVerification)
     }
 }

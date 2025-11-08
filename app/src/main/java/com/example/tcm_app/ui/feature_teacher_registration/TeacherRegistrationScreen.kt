@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tcm_app.navigation.ObserveSingleFireNavigation
+import com.example.tcm_app.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +35,7 @@ fun TeacherRegistrationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val activity = (LocalContext.current as? Activity)
-    val totalSteps = 4
+    val totalSteps = 5 // Increased total steps to include Payment
 
     viewModel.navigationEvent.ObserveSingleFireNavigation { navigation ->
         when (navigation) {
@@ -42,6 +43,11 @@ fun TeacherRegistrationScreen(
                 if (!navController.popBackStack()) {
                     activity?.finish()
                 }
+            }
+            is TeacherRegistrationNavigation.Profile -> navController.navigate(Screen.Profile.route)
+            is TeacherRegistrationNavigation.Settings -> navController.navigate(Screen.Settings.route)
+            is TeacherRegistrationNavigation.Login -> navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
             }
         }
     }
@@ -55,10 +61,46 @@ fun TeacherRegistrationScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                     }
                 },
+                actions = {
+                    IconButton(onClick = viewModel::onMenuToggled) {
+                        Icon(Icons.Default.MoreVert, "Menu")
+                    }
+                    DropdownMenu(
+                        expanded = uiState.showMenu,
+                        onDismissRequest = viewModel::onMenuToggled
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Profile") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onProfileClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Person, null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onSettingsClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Settings, null) }
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            text = { Text("Logout") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onLogoutClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Logout, null) }
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
                 )
             )
         },
@@ -94,12 +136,13 @@ fun TeacherRegistrationScreen(
                             if (uiState.currentStep < totalSteps - 1) {
                                 viewModel.onNextStep()
                             } else {
-                                // TODO: Submit form
+                                // On the last step (Payment), this becomes the final submit button
+                                // TODO: Handle submission to backend and navigate
                             }
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(if (uiState.currentStep == totalSteps - 1) "Submit" else "Next")
+                        Text(if (uiState.currentStep == totalSteps - 1) "Submit & Pay" else "Next")
                         Spacer(Modifier.width(8.dp))
                         Icon(
                             if (uiState.currentStep == totalSteps - 1) Icons.Default.Check
@@ -135,6 +178,7 @@ fun TeacherRegistrationScreen(
                     1 -> AddressStep(uiState, viewModel)
                     2 -> EducationStep(uiState, viewModel)
                     3 -> DocumentsStep()
+                    4 -> PaymentStep()
                 }
             }
         }
@@ -143,7 +187,7 @@ fun TeacherRegistrationScreen(
 
 @Composable
 fun StepProgressIndicator(currentStep: Int, totalSteps: Int, onStepClicked: (Int) -> Unit) {
-    val steps = listOf("Personal", "Address", "Education", "Documents")
+    val steps = listOf("Personal", "Address", "Education", "Documents", "Payment") // Added Payment
 
     Column(
         modifier = Modifier
@@ -557,6 +601,48 @@ fun DocumentUploadCard(documentName: String, status: String) {
         }
     }
 }
+
+@Composable
+fun PaymentStep() {
+    Column {
+        SectionHeader("Payment Details")
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Please complete the payment to finalize your registration.",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Registration Fee:", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    Text("MWK 20,000", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
+                Divider(modifier = Modifier.padding(vertical = 12.dp))
+                Text(
+                    "Select Payment Method:",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                // TODO: Replace with actual payment method selection
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(onClick = {}, modifier = Modifier.weight(1f)) { Text("Airtel Money") }
+                    Button(onClick = {}, modifier = Modifier.weight(1f)) { Text("TNM Mpamba") }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun SectionHeader(text: String) {

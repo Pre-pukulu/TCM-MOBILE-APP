@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.tcm_app.navigation.ObserveSingleFireNavigation
+import com.example.tcm_app.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,6 +28,16 @@ fun CPDTrackingScreen(
     viewModel: CPDTrackingViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    viewModel.navigationEvent.ObserveSingleFireNavigation { navigation ->
+        when (navigation) {
+            CPDTrackingNavigation.Profile -> navController.navigate(Screen.Profile.route)
+            CPDTrackingNavigation.Settings -> navController.navigate(Screen.Settings.route)
+            CPDTrackingNavigation.Login -> navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -36,10 +48,46 @@ fun CPDTrackingScreen(
                         Icon(Icons.Default.ArrowBack, "Back")
                     }
                 },
+                actions = {
+                    IconButton(onClick = viewModel::onMenuToggled) {
+                        Icon(Icons.Default.MoreVert, "Menu")
+                    }
+                    DropdownMenu(
+                        expanded = uiState.showMenu,
+                        onDismissRequest = viewModel::onMenuToggled
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Profile") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onProfileClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Person, null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onSettingsClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Settings, null) }
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            text = { Text("Logout") },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onLogoutClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Logout, null) }
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
                 )
             )
         },

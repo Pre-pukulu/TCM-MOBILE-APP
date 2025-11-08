@@ -42,6 +42,9 @@ fun DashboardScreen(
             DashboardNavigation.LicenseManagement -> navController.navigate(Screen.LicenseManagement.route)
             DashboardNavigation.CPDTracking -> navController.navigate(Screen.CPDTracking.route)
             DashboardNavigation.ApplicationStatus -> navController.navigate(Screen.ApplicationStatus.route)
+            DashboardNavigation.Settings -> navController.navigate(Screen.Settings.route)
+            DashboardNavigation.TeacherVerification -> navController.navigate(Screen.TeacherVerification.route)
+            DashboardNavigation.Notifications -> navController.navigate(Screen.Notifications.route)
         }
     }
 
@@ -59,7 +62,7 @@ fun DashboardScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Handle notifications */ }) {
+                    IconButton(onClick = viewModel::onNotificationsClick) {
                         BadgedBox(
                             badge = {
                                 Badge { Text("3") }
@@ -87,7 +90,10 @@ fun DashboardScreen(
                         )
                         DropdownMenuItem(
                             text = { Text("Settings") },
-                            onClick = { viewModel.onMenuToggled() },
+                            onClick = {
+                                viewModel.onMenuToggled()
+                                viewModel.onSettingsClick()
+                            },
                             leadingIcon = {
                                 Icon(Icons.Default.Settings, contentDescription = null)
                             }
@@ -265,6 +271,21 @@ fun DashboardScreen(
                             color = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.weight(1f),
                             onClick = viewModel::onApplicationStatusClick
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        QuickActionCard(
+                            title = "Verify Teacher",
+                            icon = Icons.Default.VerifiedUser,
+                            color = Color(0xFF43A047),
+                            modifier = Modifier.weight(1f),
+                            onClick = viewModel::onTeacherVerificationClick
                         )
                     }
                 }
