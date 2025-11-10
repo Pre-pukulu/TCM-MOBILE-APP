@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.tcm_app.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +62,7 @@ fun SettingsScreen(navController: NavController) {
                 icon = Icons.Default.Notifications,
                 title = "Notifications",
                 subtitle = "Manage notification preferences",
-                onClick = { }
+                onClick = { navController.navigate(Screen.Notifications.route) }
             )
 
             SettingsItem(
