@@ -32,7 +32,7 @@ fun SplashScreen(
                 }
             }
             SplashNavigation.Login -> {
-                navController.navigate(Screen.Login.route) {
+                navController.navigate(Screen.RoleSelection.route) {
                     popUpTo(Screen.Splash.route) { inclusive = true }
                 }
             }
