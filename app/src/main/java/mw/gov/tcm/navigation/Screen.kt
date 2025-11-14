@@ -1,4 +1,4 @@
-package com.example.tcm_app.navigation
+package mw.gov.tcm.navigation
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
@@ -9,10 +9,12 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile")
     object TeacherRegistration : Screen("teacher_registration")
     object LicenseManagement : Screen("license_management")
+    object LicenseApplication : Screen("license_application")
     object CPDTracking : Screen("cpd_tracking")
     object ApplicationStatus : Screen("application_status")
     object AdminDashboard : Screen("admin_dashboard")
     object AdminLogin : Screen("admin_login")
+    object AdminSignUp : Screen("admin_sign_up")
     object Notifications : Screen("notifications")
     object Signup : Screen("signup")
     object Settings : Screen("settings")

@@ -1,4 +1,4 @@
-package com.example.tcm_app.navigation
+package mw.gov.tcm.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

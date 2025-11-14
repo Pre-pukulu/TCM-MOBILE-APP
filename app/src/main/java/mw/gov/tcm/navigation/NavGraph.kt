@@ -1,35 +1,40 @@
-package com.example.tcm_app.navigation
+package mw.gov.tcm.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.tcm_app.ui.feature_admin.AdminDashboardScreen
-import com.example.tcm_app.ui.feature_application_status.ApplicationStatusScreen
-import com.example.tcm_app.ui.feature_cpd_tracking.CPDTrackingScreen
-import com.example.tcm_app.ui.feature_dashboard.DashboardScreen
-import com.example.tcm_app.ui.feature_license_management.LicenseManagementScreen
-import com.example.tcm_app.ui.feature_login.AdminLoginScreen
-import com.example.tcm_app.ui.feature_login.LoginScreen
-import com.example.tcm_app.ui.feature_login.StudentLoginScreen
-import com.example.tcm_app.ui.feature_notifications.NotificationsScreen
-import com.example.tcm_app.ui.feature_profile.ProfileScreen
-import com.example.tcm_app.ui.feature_register.RegisterScreen
-import com.example.tcm_app.ui.feature_role.RoleSelectionScreen
-import com.example.tcm_app.ui.feature_settings.SettingsScreen
-import com.example.tcm_app.ui.feature_splash.SplashScreen
-import com.example.tcm_app.ui.feature_student.StudentDashboardScreen
-import com.example.tcm_app.ui.feature_student.StudentIndexingScreen
-import com.example.tcm_app.ui.feature_teacher_registration.TeacherRegistrationScreen
-import com.example.tcm_app.ui.feature_teacher_verification.TeacherVerificationScreen
+import androidx.navigation.navArgument
+import mw.gov.tcm.ui.feature_admin.AdminDashboardScreen
+import mw.gov.tcm.ui.feature_application_status.ApplicationStatusScreen
+import mw.gov.tcm.ui.feature_cpd_tracking.CPDTrackingScreen
+import mw.gov.tcm.ui.feature_dashboard.DashboardScreen
+import mw.gov.tcm.ui.feature_license_application.LicenseApplicationScreen
+import mw.gov.tcm.ui.feature_license_management.LicenseManagementScreen
+import mw.gov.tcm.ui.feature_login.AdminLoginScreen
+import mw.gov.tcm.ui.feature_login.AdminSignUpScreen
+import mw.gov.tcm.ui.feature_login.LoginScreen
+import mw.gov.tcm.ui.feature_login.StudentLoginScreen
+import mw.gov.tcm.ui.feature_notifications.NotificationsScreen
+import mw.gov.tcm.ui.feature_profile.ProfileScreen
+import mw.gov.tcm.ui.feature_register.RegisterScreen
+import mw.gov.tcm.ui.feature_role.RoleSelectionScreen
+import mw.gov.tcm.ui.feature_settings.SettingsScreen
+import mw.gov.tcm.ui.feature_splash.SplashScreen
+import mw.gov.tcm.ui.feature_student.StudentDashboardScreen
+import mw.gov.tcm.ui.feature_student.StudentIndexingScreen
+import mw.gov.tcm.ui.feature_teacher_registration.TeacherRegistrationScreen
+import mw.gov.tcm.ui.feature_teacher_verification.TeacherVerificationScreen
 
 @Composable
 fun NavGraph() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
         composable(Screen.Splash.route) {
+
             SplashScreen(navController = navController)
         }
         authGraph(navController)
@@ -50,6 +55,9 @@ private fun NavGraphBuilder.authGraph(navController: NavController) {
     composable(Screen.AdminLogin.route) {
         AdminLoginScreen(navController = navController)
     }
+    composable(Screen.AdminSignUp.route) {
+        AdminSignUpScreen(navController = navController)
+    }
     composable(Screen.Register.route) {
         RegisterScreen(navController = navController)
     }
@@ -68,11 +76,17 @@ private fun NavGraphBuilder.mainGraph(navController: NavController) {
     composable(Screen.Profile.route) {
         ProfileScreen(navController = navController)
     }
-    composable(Screen.TeacherRegistration.route) {
+    composable(
+        route = "${Screen.TeacherRegistration.route}?step={step}",
+        arguments = listOf(navArgument("step") { type = NavType.IntType; defaultValue = 0 })
+    ) {
         TeacherRegistrationScreen(navController = navController)
     }
     composable(Screen.LicenseManagement.route) {
         LicenseManagementScreen(navController = navController)
+    }
+    composable(Screen.LicenseApplication.route) {
+        LicenseApplicationScreen(navController = navController)
     }
     composable(Screen.CPDTracking.route) {
         CPDTrackingScreen(navController = navController)
