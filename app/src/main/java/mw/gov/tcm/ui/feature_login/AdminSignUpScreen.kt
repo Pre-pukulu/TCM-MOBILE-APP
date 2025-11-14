@@ -1,4 +1,4 @@
-package com.example.tcm_app.ui.feature_login
+package mw.gov.tcm.ui.feature_login
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,24 +18,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.tcm_app.navigation.ObserveSingleFireNavigation
-import com.example.tcm_app.navigation.Screen
+import mw.gov.tcm.navigation.ObserveSingleFireNavigation
 
 @Composable
-fun AdminLoginScreen(
+fun AdminSignUpScreen(
     navController: NavController,
-    viewModel: AdminLoginViewModel = viewModel()
+    viewModel: AdminLoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     viewModel.navigationEvent.ObserveSingleFireNavigation { navigation ->
         when (navigation) {
             AdminLoginNavigation.AdminDashboard -> {
-                navController.navigate(Screen.AdminDashboard.route) {
-                    popUpTo(Screen.AdminLogin.route) { inclusive = true }
-                }
+                navController.popBackStack()
             }
         }
     }
@@ -47,7 +44,7 @@ fun AdminLoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Admin Login", style = MaterialTheme.typography.headlineMedium)
+        Text("Admin Sign Up", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = uiState.email,
@@ -55,7 +52,8 @@ fun AdminLoginScreen(
             label = { Text("Email") },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = uiState.error != null
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -73,19 +71,37 @@ fun AdminLoginScreen(
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = uiState.error != null
         )
         Spacer(modifier = Modifier.height(16.dp))
+
+        if (uiState.error != null) {
+            Text(
+                text = uiState.error!!,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+
         Button(
-            onClick = viewModel::onAdminLoginClick,
+            onClick = viewModel::onAdminSignUpClick,
+            enabled = !uiState.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Login")
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text("Sign Up")
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Not an admin? Login as user",
-            modifier = Modifier.clickable { navController.navigate(Screen.Login.route) }
+            text = "Already have an account? Login",
+            modifier = Modifier.clickable { navController.popBackStack() }
         )
     }
 }

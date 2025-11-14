@@ -1,4 +1,4 @@
-package com.example.tcm_app.ui.theme
+package mw.gov.tcm.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

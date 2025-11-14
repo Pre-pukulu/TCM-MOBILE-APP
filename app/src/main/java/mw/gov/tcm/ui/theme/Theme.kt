@@ -1,4 +1,4 @@
-package com.example.tcm_app.ui.theme
+package mw.gov.tcm.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
