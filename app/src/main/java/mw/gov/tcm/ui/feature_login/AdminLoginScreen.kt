@@ -21,9 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import mw.gov.tcm.navigation.ObserveSingleFireNavigation
+import mw.gov.tcm.navigation.Screen
 
 @Composable
-fun AdminSignUpScreen(
+fun AdminLoginScreen(
     navController: NavController,
     viewModel: AdminLoginViewModel = hiltViewModel()
 ) {
@@ -32,9 +33,13 @@ fun AdminSignUpScreen(
     viewModel.navigationEvent.ObserveSingleFireNavigation { navigation ->
         when (navigation) {
             AdminLoginNavigation.AdminDashboard -> {
-                navController.popBackStack()
+                navController.navigate(Screen.AdminDashboard.route) {
+                    popUpTo(Screen.AdminLogin.route) { inclusive = true }
+                }
             }
-            AdminLoginNavigation.ForgotPassword -> { /* Do nothing */ }
+            AdminLoginNavigation.ForgotPassword -> {
+                navController.navigate(Screen.ForgotPassword.route)
+            }
         }
     }
 
@@ -45,7 +50,7 @@ fun AdminSignUpScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Admin Sign Up", style = MaterialTheme.typography.headlineMedium)
+        Text("Admin Login", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = uiState.email,
@@ -86,7 +91,7 @@ fun AdminSignUpScreen(
         }
 
         Button(
-            onClick = viewModel::onAdminSignUpClick,
+            onClick = viewModel::onAdminLoginClick,
             enabled = !uiState.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -96,13 +101,23 @@ fun AdminSignUpScreen(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Sign Up")
+                Text("Login")
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Already have an account? Login",
-            modifier = Modifier.clickable { navController.popBackStack() }
+            text = "Don't have an account? Sign up",
+            modifier = Modifier.clickable { navController.navigate(Screen.AdminSignUp.route) }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Forgot Password?",
+            modifier = Modifier.clickable { viewModel.onForgotPasswordClick() }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Not an admin? Login as user",
+            modifier = Modifier.clickable { navController.navigate(Screen.RoleSelection.route) }
         )
     }
 }
