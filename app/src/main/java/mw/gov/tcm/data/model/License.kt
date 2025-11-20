@@ -1,12 +1,13 @@
 package mw.gov.tcm.data.model
 
-import androidx.annotation.Keep
-import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentId
 
-@Keep
 data class License(
+    @DocumentId
+    val id: String = "",
+    val teacherId: String = "",
     val licenseNumber: String = "",
-    val issueDate: Timestamp? = null,
-    val expiryDate: Timestamp? = null,
+    val dateOfIssue: String = "",
+    val expiryDate: String = "",
     val status: String = ""
 )

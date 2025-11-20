@@ -5,11 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import mw.gov.tcm.data.Result
 import mw.gov.tcm.data.model.Application
 import mw.gov.tcm.data.teacher.TeacherRepository
 import javax.inject.Inject
@@ -25,7 +23,8 @@ data class LicenseApplicationState(
 
 @HiltViewModel
 class LicenseApplicationViewModel @Inject constructor(
-    private val teacherRepository: TeacherRepository
+    private val teacherRepository: TeacherRepository,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     var uiState by mutableStateOf(LicenseApplicationState())
@@ -44,30 +43,31 @@ class LicenseApplicationViewModel @Inject constructor(
     }
 
     fun submitApplication() {
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            uiState = uiState.copy(submissionResult = "Error: User not logged in.")
+            return
+        }
+
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
 
             val application = Application(
+                id = userId,
                 fullName = uiState.fullName,
                 tcmNumber = uiState.tcmNumber,
                 type = uiState.applicationType
             )
 
-            teacherRepository.submitLicenseApplication(application)
-                .onEach { result ->
-                    when (result) {
-                        is Result.Success -> {
-                            uiState = uiState.copy(isLoading = false, submissionResult = "Application submitted successfully!")
-                        }
-                        is Result.Error -> {
-                            uiState = uiState.copy(
-                                isLoading = false,
-                                submissionResult = result.exception.message ?: "An unknown error occurred."
-                            )
-                        }
-                    }
-                }
-                .launchIn(viewModelScope)
+            try {
+                teacherRepository.submitLicenseApplication(application)
+                uiState = uiState.copy(isLoading = false, submissionResult = "Application submitted successfully!")
+            } catch (e: Exception) {
+                uiState = uiState.copy(
+                    isLoading = false,
+                    submissionResult = e.message ?: "An unknown error occurred."
+                )
+            }
         }
     }
 }

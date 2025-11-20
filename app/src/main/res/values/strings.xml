@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TCM-APP</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="password_reset_email_sent">Password reset email sent</string>
+    <string name="email">Email</string>
+    <string name="send_password_reset_email">Send password reset email</string>
 </resources>

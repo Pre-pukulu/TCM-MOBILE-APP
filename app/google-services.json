@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "813296075446",
+    "project_id": "tcm-app-4de78",
+    "storage_bucket": "tcm-app-4de78.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813296075446:android:b24d67144a488c949a1c17",
+        "android_client_info": {
+          "package_name": "mw.gov.tcm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813296075446-nalgpv400qgln42gng8u2abe9qubdjgn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCF-x7kOzqrtaFTZc8LDfHYWhzyhGOpVbc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813296075446-nalgpv400qgln42gng8u2abe9qubdjgn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

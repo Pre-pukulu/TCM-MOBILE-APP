@@ -1,12 +1,11 @@
 package mw.gov.tcm.data.model
 
-import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentId
 
 data class Application(
-    val type: String = "",
-    val status: String = "Pending",
-    val dateSubmitted: Timestamp? = null,
-    val lastUpdated: Timestamp? = null,
+    @DocumentId
+    val id: String = "",
     val fullName: String = "",
-    val tcmNumber: String = ""
+    val tcmNumber: String = "",
+    val type: String = ""
 )

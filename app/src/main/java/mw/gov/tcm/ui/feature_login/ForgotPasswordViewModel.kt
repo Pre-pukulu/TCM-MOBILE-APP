@@ -1,0 +1,55 @@
+package mw.gov.tcm.ui.feature_login
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import mw.gov.tcm.data.auth.AuthRepository
+import mw.gov.tcm.navigation.mutableSingleFireNavigation
+import javax.inject.Inject
+
+sealed class ForgotPasswordNavigation {
+    object Back : ForgotPasswordNavigation()
+}
+
+data class ForgotPasswordState(
+    val email: String = "",
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val emailSent: Boolean = false
+)
+
+@HiltViewModel
+class ForgotPasswordViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(ForgotPasswordState())
+    val uiState = _uiState.asStateFlow()
+
+    private val _navigationEvent = mutableSingleFireNavigation<ForgotPasswordNavigation>()
+    val navigationEvent = _navigationEvent
+
+    fun onEmailChange(email: String) {
+        _uiState.update { it.copy(email = email) }
+    }
+
+    fun onForgotPasswordClick() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                authRepository.forgotPassword(uiState.value.email)
+                _uiState.update { it.copy(isLoading = false, emailSent = true) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.message) }
+            }
+        }
+    }
+
+    fun onBackClick() {
+        _navigationEvent.tryEmit(ForgotPasswordNavigation.Back)
+    }
+}

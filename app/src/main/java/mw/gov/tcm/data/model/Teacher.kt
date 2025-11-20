@@ -1,19 +1,19 @@
 package mw.gov.tcm.data.model
 
-import androidx.annotation.Keep
-import com.google.firebase.firestore.IgnoreExtraProperties
+import com.google.firebase.firestore.DocumentId
 
-@Keep
-@IgnoreExtraProperties
 data class Teacher(
+    @DocumentId
+    val id: String = "",
     val firstName: String = "",
     val lastName: String = "",
+    val email: String = "",
+    val registrationStep: Int = 0,
     val middleName: String = "",
     val nationalId: String = "",
     val dateOfBirth: String = "",
     val gender: String = "",
     val phone: String = "",
-    val email: String = "",
     val district: String = "",
     val traditionalAuthority: String = "",
     val village: String = "",
