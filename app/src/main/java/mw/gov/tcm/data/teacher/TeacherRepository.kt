@@ -11,5 +11,5 @@ interface TeacherRepository {
     suspend fun getLicense(teacherId: String): License?
     suspend fun saveTeacher(teacher: Teacher)
     suspend fun verifyTeacher(query: String, searchType: String): TeacherSearchResult?
-    suspend fun getApplication(teacherId: String): Application?
+    suspend fun getApplications(teacherId: String): List<Application>
 }

@@ -5,7 +5,9 @@ import com.google.firebase.firestore.DocumentId
 data class Application(
     @DocumentId
     val id: String = "",
+    val teacherId: String = "",
     val fullName: String = "",
     val tcmNumber: String = "",
-    val type: String = ""
+    val type: String = "",
+    val status: String = ""
 )

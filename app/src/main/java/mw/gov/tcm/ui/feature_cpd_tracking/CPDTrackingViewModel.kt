@@ -40,7 +40,7 @@ class CpdTrackingViewModel @Inject constructor(
             return
         }
 
-        db.collection("users").document(userId).collection("cpd_activities")
+        db.collection("teachers").document(userId).collection("cpd_activities")
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
                     _uiState.update { it.copy(isLoading = false, error = "Failed to load activities: ${e.message}") }
@@ -59,7 +59,7 @@ class CpdTrackingViewModel @Inject constructor(
             return
         }
 
-        db.collection("users").document(userId).collection("cpd_activities")
+        db.collection("teachers").document(userId).collection("cpd_activities")
             .add(activity)
             .addOnSuccessListener {
                 // Optionally refresh or rely on snapshot listener

@@ -10,8 +10,6 @@ import mw.gov.tcm.data.auth.AuthRepository
 import mw.gov.tcm.data.auth.AuthRepositoryImpl
 import mw.gov.tcm.data.repository.ApplicationStatusRepository
 import mw.gov.tcm.data.repository.ApplicationStatusRepositoryImpl
-import mw.gov.tcm.data.teacher.TeacherRepository
-import mw.gov.tcm.data.teacher.TeacherRepositoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -28,12 +26,6 @@ object AppModule {
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
-    }
-
-    @Provides
-    @Singleton
-    fun provideTeacherRepository(firestore: FirebaseFirestore): TeacherRepository {
-        return TeacherRepositoryImpl(firestore)
     }
 
     @Provides

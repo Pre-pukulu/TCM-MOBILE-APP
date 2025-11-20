@@ -53,10 +53,11 @@ class LicenseApplicationViewModel @Inject constructor(
             uiState = uiState.copy(isLoading = true)
 
             val application = Application(
-                id = userId,
+                teacherId = userId,
                 fullName = uiState.fullName,
                 tcmNumber = uiState.tcmNumber,
-                type = uiState.applicationType
+                type = uiState.applicationType,
+                status = "Pending"
             )
 
             try {

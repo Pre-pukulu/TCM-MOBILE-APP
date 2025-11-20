@@ -80,12 +80,12 @@ class TeacherRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getApplication(teacherId: String): Application? {
+    override suspend fun getApplications(teacherId: String): List<Application> {
         return try {
             firestore.collection("applications").whereEqualTo("teacherId", teacherId).get().await()
-                .toObjects(Application::class.java).firstOrNull()
+                .toObjects(Application::class.java)
         } catch (e: Exception) {
-            null
+            emptyList()
         }
     }
 }

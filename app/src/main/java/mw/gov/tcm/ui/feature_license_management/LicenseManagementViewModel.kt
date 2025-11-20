@@ -26,7 +26,7 @@ sealed class LicenseManagementNavigation {
 data class LicenseManagementState(
     val teacher: Teacher? = null,
     val license: License? = null,
-    val application: Application? = null,
+    val applications: List<Application> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null,
     val showMenu: Boolean = false
@@ -60,8 +60,8 @@ class LicenseManagementViewModel @Inject constructor(
             try {
                 val teacher = teacherRepository.getTeacher(userId)
                 val license = teacherRepository.getLicense(userId)
-                val application = teacherRepository.getApplication(userId)
-                _uiState.update { it.copy(teacher = teacher, license = license, application = application, isLoading = false) }
+                val applications = teacherRepository.getApplications(userId)
+                _uiState.update { it.copy(teacher = teacher, license = license, applications = applications, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message, isLoading = false) }
             }
@@ -85,7 +85,8 @@ class LicenseManagementViewModel @Inject constructor(
     }
 
     fun onApplyForLicenseClick() {
-        if (_uiState.value.application == null) {
+        val hasPendingApplication = uiState.value.applications.any { it.status == "Pending" }
+        if (uiState.value.license == null && !hasPendingApplication) {
             _navigationEvent.tryEmit(LicenseManagementNavigation.ApplyForLicense)
         }
     }

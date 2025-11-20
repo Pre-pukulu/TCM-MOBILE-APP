@@ -144,7 +144,14 @@ fun LicenseManagementScreen(
                             "Could not load your profile. Please try again later.",
                             textAlign = TextAlign.Center
                         )
-                    } else { // Implies license is null
+                    } else if (uiState.applications.any { it.status == "Pending" }) {
+                        Text("Application in Progress", style = MaterialTheme.typography.headlineSmall)
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            "Your license application is currently being reviewed. You will be notified once there is an update.",
+                            textAlign = TextAlign.Center
+                        )
+                    } else { // Implies license is null and no pending application
                         Text("No License Found", style = MaterialTheme.typography.headlineSmall)
                         Spacer(Modifier.height(8.dp))
                         Text(

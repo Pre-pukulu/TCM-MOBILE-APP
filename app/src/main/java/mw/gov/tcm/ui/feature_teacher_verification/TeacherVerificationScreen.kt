@@ -20,14 +20,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeacherVerificationScreen(
     navController: NavController,
-    viewModel: TeacherVerificationViewModel = viewModel()
+    viewModel: TeacherVerificationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -389,7 +389,7 @@ fun TeacherVerificationScreen(
                             )
                             Spacer(Modifier.width(12.dp))
                             Text(
-                                "Always verify the teacher's physical ID card matches this information",
+                                "Always verify the teacher\'s physical ID card matches this information",
                                 fontSize = 13.sp,
                                 color = Color(0xFFE65100)
                             )
@@ -465,7 +465,7 @@ fun TeacherVerificationScreen(
                     )
                     HelpStep(
                         number = "2",
-                        text = "Enter the teacher's information"
+                        text = "Enter the teacher\'s information"
                     )
                     HelpStep(
                         number = "3",
