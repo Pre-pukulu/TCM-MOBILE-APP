@@ -1,6 +1,7 @@
 package mw.gov.tcm.data.model
 
 import com.google.firebase.firestore.DocumentId
+import java.util.Date
 
 data class Application(
     @DocumentId
@@ -9,5 +10,7 @@ data class Application(
     val fullName: String = "",
     val tcmNumber: String = "",
     val type: String = "",
-    val status: String = ""
+    val status: String = "",
+    val applicationDate: Date = Date(),
+    val estimatedCompletionDate: Date = Date()
 )
