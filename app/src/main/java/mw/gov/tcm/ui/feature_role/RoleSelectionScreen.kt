@@ -208,6 +208,26 @@ fun RoleSelectionScreen(
                         fontSize = 14.sp
                     )
                 }
+
+                // Admin Login Link
+                TextButton(
+                    onClick = {
+                        navController.navigate(Screen.AdminLogin.route)
+                    }
+                ) {
+                    Icon(
+                        Icons.Default.AdminPanelSettings,
+                        null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        "Login as Admin",
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
     }

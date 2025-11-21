@@ -6,4 +6,5 @@ interface AuthRepository {
     suspend fun login(email: String, pass: String): AuthResult
     suspend fun signUp(email: String, pass: String): AuthResult
     suspend fun forgotPassword(email: String): Void?
+    suspend fun isAdmin(uid: String): Boolean
 }

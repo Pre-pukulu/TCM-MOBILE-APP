@@ -40,6 +40,11 @@ fun LoginScreen(
                     popUpTo(Screen.Login.route) { inclusive = true }
                 }
             }
+            LoginNavigation.AdminDashboard -> {
+                navController.navigate(Screen.AdminDashboard.route) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
+            }
             LoginNavigation.ForgotPassword -> {
                 navController.navigate(Screen.TeacherForgotPassword.route)
             }

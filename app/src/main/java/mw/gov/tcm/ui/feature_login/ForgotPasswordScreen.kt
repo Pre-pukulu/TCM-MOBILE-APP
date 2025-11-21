@@ -20,10 +20,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mw.gov.tcm.R
 import mw.gov.tcm.navigation.ObserveSingleFireNavigation
-import mw.gov.tcm.ui.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,17 +44,28 @@ fun ForgotPasswordScreen(
         topBar = {
             TopAppBar(title = { Text(stringResource(id = R.string.forgot_password)) })
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
-                .padding(MaterialTheme.spacing.medium),
+                .padding(padding)
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             if (uiState.emailSent) {
-                Text(stringResource(id = R.string.password_reset_email_sent))
+                Text(
+                    text = stringResource(id = R.string.password_reset_email_sent),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = { viewModel.onBackClick() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(id = R.string.back_to_login))
+                }
             } else {
                 OutlinedTextField(
                     value = uiState.email,
@@ -63,7 +75,7 @@ fun ForgotPasswordScreen(
                     isError = uiState.error != null
                 )
 
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = viewModel::onForgotPasswordClick,
@@ -77,7 +89,7 @@ fun ForgotPasswordScreen(
                     Text(
                         text = it,
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(top = MaterialTheme.spacing.small)
+                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
             }

@@ -8,8 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mw.gov.tcm.data.auth.AuthRepository
 import mw.gov.tcm.data.auth.AuthRepositoryImpl
-import mw.gov.tcm.data.repository.ApplicationStatusRepository
-import mw.gov.tcm.data.repository.ApplicationStatusRepositoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -30,16 +28,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideApplicationStatusRepository(
-        firestore: FirebaseFirestore,
-        auth: FirebaseAuth
-    ): ApplicationStatusRepository {
-        return ApplicationStatusRepositoryImpl(firestore, auth)
-    }
-
-    @Provides
-    @Singleton
-    fun provideAuthRepository(firebaseAuth: FirebaseAuth): AuthRepository {
-        return AuthRepositoryImpl(firebaseAuth)
+    fun provideAuthRepository(firebaseAuth: FirebaseAuth, firestore: FirebaseFirestore): AuthRepository {
+        return AuthRepositoryImpl(firebaseAuth, firestore)
     }
 }

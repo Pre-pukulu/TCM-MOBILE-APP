@@ -2,6 +2,7 @@ package mw.gov.tcm.ui.feature_login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +14,7 @@ import javax.inject.Inject
 
 sealed class LoginNavigation {
     object Dashboard : LoginNavigation()
+    object AdminDashboard : LoginNavigation()
     object ForgotPassword : LoginNavigation()
 }
 
@@ -26,7 +28,8 @@ data class LoginState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginState())
@@ -51,11 +54,21 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                authRepository.login(uiState.value.email, uiState.value.password)
-                _uiState.update { it.copy(isLoading = false) }
-                _navigationEvent.tryEmit(LoginNavigation.Dashboard)
+                val result = authRepository.login(uiState.value.email, uiState.value.password)
+                val uid = result.user?.uid
+                if (uid != null) {
+                    if (authRepository.isAdmin(uid)) {
+                        _navigationEvent.tryEmit(LoginNavigation.AdminDashboard)
+                    } else {
+                        _navigationEvent.tryEmit(LoginNavigation.Dashboard)
+                    }
+                } else {
+                    _uiState.update { it.copy(isLoading = false, error = "Could not get user ID.") }
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

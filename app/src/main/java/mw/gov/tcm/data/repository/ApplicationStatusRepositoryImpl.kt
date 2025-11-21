@@ -5,6 +5,8 @@ import androidx.compose.material.icons.filled.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import mw.gov.tcm.data.model.LicenseApplication
+import mw.gov.tcm.data.datasource.LicenseApplicationDataSource
 import mw.gov.tcm.ui.feature_application_status.Document
 import mw.gov.tcm.ui.feature_application_status.StageStatus
 import mw.gov.tcm.ui.feature_application_status.TimelineStage
@@ -12,67 +14,77 @@ import javax.inject.Inject
 
 class ApplicationStatusRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val licenseApplicationDataSource: LicenseApplicationDataSource
 ) : ApplicationStatusRepository {
 
     override suspend fun getApplicationStatus(): Pair<List<TimelineStage>, List<Document>> {
-        val userId = auth.currentUser?.uid ?: return Pair(emptyList(), emptyList())
+        val application = getLicenseApplication()
 
-        // In a real app, you might fetch the application first to determine what to show.
-        // For now, we will return the same dummy data regardless of the user.
+        val stages = mapApplicationToStages(application)
+        val documents = mapApplicationToDocuments(application)
 
-        val stages = getDummyStages()
-        val documents = getDummyDocuments()
         return Pair(stages, documents)
     }
 
-    private fun getDummyStages(): List<TimelineStage> {
+    override suspend fun getLicenseApplication(): LicenseApplication? {
+        return licenseApplicationDataSource.getLicenseApplication()
+    }
+
+    private fun mapApplicationToStages(application: LicenseApplication?): List<TimelineStage> {
+        if (application == null) return emptyList() // Or return a default state
+
+        // This is a simplified mapping logic. You can expand this based on your app's needs.
         return listOf(
             TimelineStage(
                 "Application Submitted",
                 "Your application has been received",
-                "15 Nov 2024, 10:30 AM",
+                application.submissionDate.toString(), // Format this date as needed
                 Icons.Default.CheckCircle,
-                StageStatus.COMPLETED
+                if (application.status >= "Submitted") StageStatus.COMPLETED else StageStatus.PENDING
             ),
             TimelineStage(
                 "Initial Review",
                 "Application under initial review",
-                "16 Nov 2024, 2:15 PM",
+                if (application.status == "In Review") "In Progress" else "Pending",
                 Icons.Default.Assignment,
-                StageStatus.COMPLETED
+                if (application.status == "In Review") StageStatus.IN_PROGRESS else if (application.status > "In Review") StageStatus.COMPLETED else StageStatus.PENDING
             ),
             TimelineStage(
                 "Document Verification",
                 "Verifying uploaded documents",
-                "In Progress",
+                if (application.status == "Document Verification") "In Progress" else "Pending",
                 Icons.Default.Description,
-                StageStatus.IN_PROGRESS
+                if (application.status == "Document Verification") StageStatus.IN_PROGRESS else if (application.status > "Document Verification") StageStatus.COMPLETED else StageStatus.PENDING
             ),
             TimelineStage(
                 "Payment Processing",
                 "Awaiting payment confirmation",
-                "Pending",
+                if (application.status == "Payment Processing") "In Progress" else "Pending",
                 Icons.Default.Payment,
-                StageStatus.PENDING
+                if (application.status == "Payment Processing") StageStatus.IN_PROGRESS else if (application.status > "Payment Processing") StageStatus.COMPLETED else StageStatus.PENDING
             ),
             TimelineStage(
                 "Approval & License Issue",
                 "Final approval and license generation",
-                "Pending",
+                if (application.status == "Approved") "Completed" else "Pending",
                 Icons.Default.CardMembership,
-                StageStatus.PENDING
+                if (application.status == "Approved") StageStatus.COMPLETED else StageStatus.PENDING
             )
         )
     }
 
-    private fun getDummyDocuments(): List<Document> {
+    private fun mapApplicationToDocuments(application: LicenseApplication?): List<Document> {
+        if (application == null) return emptyList()
+
+        // This assumes your LicenseApplication data class has a list of documents or fields for them.
+        // You would replace these with actual fields from your LicenseApplication.
         return listOf(
-            Document("Passport Photo", true, "Verified"),
-            Document("National ID", true, "Verified"),
-            Document("MSCE Certificate", true, "Verified"),
-            Document("Teaching Diploma", true, "Under Review"),
-            Document("Police Report", false, "Missing")
+            Document("Passport Photo", application.passportPhotoUrl.isNotBlank(), if (application.passportPhotoUrl.isNotBlank()) "Verified" else "Missing"),
+            Document("National ID", application.nationalIdUrl.isNotBlank(), if (application.nationalIdUrl.isNotBlank()) "Verified" else "Missing"),
+            Document("MSCE Certificate", application.msceCertificateUrl.isNotBlank(), if (application.msceCertificateUrl.isNotBlank()) "Verified" else "Missing"),
+            Document("Teaching Diploma", application.teachingDiplomaUrl.isNotBlank(), if (application.teachingDiplomaUrl.isNotBlank()) "Verified" else "Missing"),
+            Document("Police Report", application.policeReportUrl.isNotBlank(), if (application.policeReportUrl.isNotBlank()) "Verified" else "Missing")
         )
     }
 }

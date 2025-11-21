@@ -3,6 +3,7 @@ package mw.gov.tcm.ui.feature_login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -43,6 +44,8 @@ class TeacherForgotPasswordViewModel @Inject constructor(
             try {
                 authRepository.forgotPassword(uiState.value.email)
                 _uiState.update { it.copy(isLoading = false, emailSent = true) }
+                delay(3000)
+                _navigationEvent.tryEmit(TeacherForgotPasswordNavigation.Back)
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
             }

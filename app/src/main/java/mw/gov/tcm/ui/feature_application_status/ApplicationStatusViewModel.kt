@@ -26,8 +26,11 @@ class ApplicationStatusViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val (stages, documents) = repository.getApplicationStatus()
+                val currentStage = stages.indexOfFirst { it.status == StageStatus.IN_PROGRESS }.let {
+                    if (it == -1) stages.size - 1 else it
+                }
                 _uiState.value = ApplicationStatusUiState(
-                    currentStage = 2, // This is still hardcoded, will be dynamic later
+                    currentStage = currentStage,
                     stages = stages,
                     documents = documents,
                     isLoading = false
